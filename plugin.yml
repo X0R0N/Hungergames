@@ -1,0 +1,28 @@
+name: Hungergames
+main: x0r0n.heavyhacker.hungergames.Hungergames
+version: 1.0
+
+commands:
+   hungergames:
+      description: Test it!
+      usage: /Hungergames
+      permission: hungergames.hungergames
+      permission-message: You don't have permission.
+      
+permissions:
+    hungergames.*:
+        description: Access to all Hungergames commands!
+        children:
+            hungergames.hungergames: true
+
+    hungergames.hungergames:
+        description: Hungergames Command Overview
+        default: true
+        
+    hungergames.spectator:
+        description: Set Spectator mode
+        default: true
+        
+    hungergames.teamup:
+        description: Win in Team
+        default: true
