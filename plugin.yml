@@ -4,7 +4,7 @@ version: 1.0
 
 commands:
    hungergames:
-      description: Test it!
+      description: Get a command overview for the Hungergames!
       usage: /Hungergames
       permission: hungergames.hungergames
       permission-message: You don't have permission.
@@ -17,12 +17,4 @@ permissions:
 
     hungergames.hungergames:
         description: Hungergames Command Overview
-        default: true
-        
-    hungergames.spectator:
-        description: Set Spectator mode
-        default: true
-        
-    hungergames.teamup:
-        description: Win in Team
         default: true
