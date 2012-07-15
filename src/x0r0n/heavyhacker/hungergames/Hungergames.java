@@ -2,9 +2,13 @@ package x0r0n.heavyhacker.hungergames;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
+import org.bukkit.Material;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -27,7 +31,8 @@ public class Hungergames extends JavaPlugin {
 	public List<CapsuleInformation> capsuleInformation=new ArrayList<CapsuleInformation>();
 	private HashMap<String,Integer> spectator = new HashMap<String,Integer> ();
 	public BukkitScheduler s;
-
+	public ChestManager chestMgr;
+	
 	// Config declaration
 	File configFile;
 	FileConfiguration config;
@@ -35,6 +40,9 @@ public class Hungergames extends JavaPlugin {
 	public void onEnable() {
 		// Disabling map saving
 		getServer().getWorlds().get(0).setAutoSave(false);
+		
+		// Kill all Mobs
+		Butcher();
 
 		// Load Scheduler for creating Multiple Thread Tasks
 		s=getServer().getScheduler();
@@ -51,6 +59,9 @@ public class Hungergames extends JavaPlugin {
 		for(int i=0; i<24; ++i) {
 			capsuleInformation.add(new CapsuleInformation(this,i));
 		}
+		
+		// Init Chestmanager
+		chestMgr = new ChestManager(this);
 
 		// Register tasks
 		s.scheduleSyncRepeatingTask(this, new PlayerExpell(this), 0, 40);
@@ -63,6 +74,7 @@ public class Hungergames extends JavaPlugin {
 		getServer().getPluginManager().registerEvents(new LoginEventListener(this), this);
 		getServer().getPluginManager().registerEvents(new PlayerEventListener(this), this);
 		getServer().getPluginManager().registerEvents(new BlockEventListener(this), this);
+		getServer().getPluginManager().registerEvents(new EntityEventListener(this), this);
 
 	}
 
@@ -135,8 +147,8 @@ public class Hungergames extends JavaPlugin {
 		    			s.scheduleAsyncDelayedTask(this, gameCountDown, 0);
 		    		} else if(args[0].equalsIgnoreCase("stop") && player.isOp()) {
 		    			StopGame();
-		    		//} else if(args[0].equalsIgnoreCase("save") && player.isOp()) {
-		    		//	SaveCoords(player, args[1]);
+		    		} else if(args[0].equalsIgnoreCase("save") && player.isOp()) {
+		    			SaveCoords();
 		    		} else if(args[0].equalsIgnoreCase("info")) {
 		    			sender.sendMessage("You are running the Hungergames Plugin v1.0 (ALPHA) by X0R0N (eddy123) and HeavyHacker (HolyWater) Yaay!");		    			
 		    		} else if(args[0].equalsIgnoreCase("spectator")) {
@@ -157,11 +169,20 @@ public class Hungergames extends JavaPlugin {
 	    }
 	}
 
-	/*
-	public void SaveCoords(Player player, String a) {
-		this.config.set("capsules."+a, new Vector(player.getLocation().getX(),player.getLocation().getY(),player.getLocation().getZ()));
+	private void SaveCoords() {
+		/*
+		Vector v=p.getLocation().toVector().subtract(p.getWorld().getSpawnLocation().toVector());
+		v.setX(Math.round(v.getX()));
+		v.setY(Math.round(v.getY()));
+		v.setZ(Math.round(v.getZ()));
+		config.set("spawnchest."+string, v);
+		saveYamls();*/
+		List<ItemStack> homolist=new ArrayList<ItemStack>();
+		homolist.add(new ItemStack(Material.BLAZE_POWDER,14));
+		homolist.add(new ItemStack(Material.COMPASS,4));
+		config.set("fap", homolist);
 		saveYamls();
-	}*/
+	}
 
 	public void StartGame() {
 		// Launch players and start hungergames
@@ -171,6 +192,8 @@ public class Hungergames extends JavaPlugin {
 				Launch(c.GetPlayer(), 1.9);
 			}
 		}
+		getServer().getWorlds().get(0).setTime(0);
+		chestMgr.FillSpawnChests();
 		isRunning=true;
 	}
 
@@ -207,6 +230,11 @@ public class Hungergames extends JavaPlugin {
 			}
 		}
 		p.getWorld().createExplosion(p.getWorld().getSpawnLocation().add(0, -15, 0), 0);
+		for(ItemStack i: p.getInventory().getContents()) {
+			if(i==null) {continue;}
+			p.getWorld().dropItem(p.getPlayer().getLocation(),i);
+		}
+		p.getInventory().clear();		
 		p.teleport(p.getWorld().getSpawnLocation());
 		p.setHealth(20);
 		p.setFoodLevel(20);
@@ -237,5 +265,14 @@ public class Hungergames extends JavaPlugin {
 		if(spectator.get(p.getName())==null) { return false; }
 		if(spectator.get(p.getName())!=1) { return false; }
 		return true;
+	}
+	
+	public void Butcher() {
+		for(Entity e:getServer().getWorlds().get(0).getEntities()) {
+			if(e.getType()==EntityType.OCELOT || e.getType()==EntityType.SHEEP || e.getType()==EntityType.SQUID || e.getType()==EntityType.SLIME) {
+				//Ocelot bitches
+				e.remove();
+			}
+		}
 	}
 }

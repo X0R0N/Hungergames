@@ -32,9 +32,13 @@ public class PlayerEventListener implements Listener {
 	private Hungergames hunger;
 	Random random = new Random();
 	private int rand;
+	private double spawnrange;
+	private double spawnheight;
 
 	PlayerEventListener(Hungergames g) {
 		hunger=g;
+		spawnrange = hunger.config.getDouble("settings.spawnrange",60.0);
+		spawnheight = hunger.config.getVector("capsules.1",new Vector(182,50,266)).getY()+10;
 	}
 	
 	@EventHandler(priority = EventPriority.HIGHEST)
@@ -64,8 +68,12 @@ public class PlayerEventListener implements Listener {
 	@EventHandler(priority=EventPriority.HIGH)
     public void onEntityDamage(EntityDamageEvent event) {
 		if(event.getEntityType()==EntityType.PLAYER) {
-			if (((LivingEntity) event.getEntity()).getHealth() <= event.getDamage()) {
+			if (!hunger.IsRunning()) {
+				event.setCancelled(true);
+			} else if (((LivingEntity) event.getEntity()).getHealth() <= event.getDamage()) {
 				hunger.die((Player) event.getEntity());
+				event.setCancelled(true);
+			} else if (event.getEntity().getLocation().distance(event.getEntity().getWorld().getSpawnLocation())<spawnrange && event.getEntity().getLocation().getY()<spawnheight) {
 				event.setCancelled(true);
 			}
 		}

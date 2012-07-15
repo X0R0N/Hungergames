@@ -51,8 +51,10 @@ public class LoginEventListener implements Listener {
 		event.getPlayer().sendMessage(ChatColor.GOLD+"Welcome, "+ event.getPlayer().getDisplayName() + " to the Hunger Games!");
 		event.getPlayer().sendMessage(ChatColor.GOLD+"Type /hungergames to see your commands!");
 		
-		if(!hunger.IsRunning())
+		if(!hunger.IsRunning()) {
+			event.getPlayer().teleport(event.getPlayer().getWorld().getSpawnLocation());
 			return;
+		}
 		
 		for(CapsuleInformation c: hunger.capsuleInformation) {
 			if(c.GetPlayer()==null)

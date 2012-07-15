@@ -1,5 +1,6 @@
 package x0r0n.heavyhacker.hungergames;
 
+import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -7,6 +8,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 
 public class EntityEventListener implements Listener {
 	private Hungergames hunger;
@@ -19,35 +21,25 @@ public class EntityEventListener implements Listener {
 	@EventHandler(priority = EventPriority.NORMAL)
 	public void onExplode(ExplosionPrimeEvent event) {
 		if(Math.abs(event.getEntity().getLocation().distance(event.getEntity().getWorld().getSpawnLocation()))<spawnRange) {
+			event.getEntity().getWorld().createExplosion(event.getEntity().getLocation(),0);
+			event.getEntity().remove();
 			event.setCancelled(true);
 		}
 	}
 	
 	@EventHandler(priority = EventPriority.NORMAL)
-	public void onPVP(EntityDamageByEntityEvent event) {
-		if(!hunger.IsRunning()) {
+	public void onEntitySpawn(CreatureSpawnEvent event) {
+		if(event.getEntityType()==EntityType.OCELOT) {
 			event.setCancelled(true);
-			return;
 		}
-		if(event.getDamager().getType()!=EntityType.PLAYER && event.getEntityType()==EntityType.PLAYER) {
-			for(CapsuleInformation c: hunger.capsuleInformation) {
-				c.IsPlaying();
-				Player p=c.GetPlayer();
-				if(p!=null) {continue;}
-				if(p.getEntityId()==event.getEntity().getEntityId() && c.IsPlaying()) {
-					return;
-				}
-			}
-		} else if(event.getDamager().getType()==EntityType.PLAYER) {
-			for(CapsuleInformation c: hunger.capsuleInformation) {
-				c.IsPlaying();
-				Player p=c.GetPlayer();
-				if(p!=null) {continue;}
-				if(p.getEntityId()==event.getDamager().getEntityId() && c.IsPlaying()) {
-					return;
-				}
-			}
+		if(event.getEntityType()==EntityType.SHEEP) {
+			event.setCancelled(true);
 		}
-		event.setCancelled(true);
+		if(event.getEntityType()==EntityType.SQUID) {
+			event.setCancelled(true);
+		}
+		if(event.getEntityType()==EntityType.SLIME) {
+			event.setCancelled(true);
+		}
 	}
 }

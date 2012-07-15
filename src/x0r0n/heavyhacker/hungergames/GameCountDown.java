@@ -56,19 +56,25 @@ public class GameCountDown implements Runnable {
 		for(CapsuleInformation c: hunger.capsuleInformation) {
 			if (c.GetPlayer()!=null) { continue; }
 			for(Player p: hunger.getServer().getWorlds().get(0).getPlayers()) {
-				if (hunger.IsSpectator(p)) { continue; }
+				if (hunger.IsSpectator(p)) { 
+					p.teleport(p.getWorld().getSpawnLocation());
+					continue; 
+				}
 				boolean b=true;
-				
 				for(CapsuleInformation c2: hunger.capsuleInformation) {
 					if(c2.GetPlayer()==null) {continue;}
 					if(c2.GetPlayer().getName().equalsIgnoreCase(p.getName())) {
 						b=false;
 						break;
 					}
+					if(p.getLocation().distance(c2.GetPlayer().getLocation())<1) {
+						p.teleport(p.getWorld().getSpawnLocation());
+						b=false;
+						break;
+					}
 				}
-				
 				if(!b) {continue;}
-				
+
 				c.InsertPlayer(p);
 				p.teleport(new Location(p.getWorld(),c.GetVector().getX()+0.5,c.GetVector().getY()+1,c.GetVector().getZ()+0.5));
 				break;

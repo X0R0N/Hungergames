@@ -5,6 +5,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 import org.bukkit.ChatColor;
 import java.io.File;
@@ -42,6 +43,8 @@ public class CapsuleInformation {
 			return false;
 		}
 		player=p;
+		p.getInventory().clear();
+		p.getInventory().addItem(new ItemStack(Material.COMPASS,1));
 		for(CapsuleInformation c: hunger.capsuleInformation) {
 			if(c!=this && c.GetPlayer()==p) {
 				player=null;
@@ -136,7 +139,7 @@ public class CapsuleInformation {
 			}
 			s.update(true);
 		} else {
-			hunger.getLogger().info("[ERROR] Sign expected, found "+loc.getBlock().getType()+" at "+loc.getX()+","+loc.getZ()+"!");
+			hunger.getLogger().info("[ERROR] Sign expected, found "+loc.getBlock().getType()+" at "+loc.getX()+","+loc.getZ()+","+loc.getY()+" ->"+index+"!");
 		}
 	}
 
